@@ -1,9 +1,9 @@
 import random
-
+import matplotlib.pyplot as plt
 class Genetic:
-  POPULATION_SIZE = 100
+  POPULATION_SIZE = 200
   MUTATION_PROB = 0.1
-  MAX_GEN = 100
+  MAX_GEN = 500
   def __init__(self, W: int, m: int, w: 'list[int]', v: 'list[int]', c: 'list[int]') -> None:
     if len(w) != len(v) or len(w) != len(c) or len(v) != len(c):
       raise Exception("Invalid parameters")
@@ -14,6 +14,8 @@ class Genetic:
     self.v = v
     self.c = c
     self.population = [random.getrandbits(self.n) for _ in range(Genetic.POPULATION_SIZE)]
+    self.best_chromosome = 0
+    self.best_value = 0
 
   def fitness(self, chromosome: int):
     total_v = 0
@@ -33,6 +35,10 @@ class Genetic:
     if len(classes) != self.m:
       return 0
     
+    if total_v > self.best_value:
+      self.best_value = total_v
+      self.best_chromosome = chromosome
+
     return total_v
   
   def selection(self, fitnesses: 'list[int]', max_per_tournament=2):
@@ -64,22 +70,28 @@ class Genetic:
     return chromosome ^ (1 << c)
 
   def choose_best(self):
-    fitnesses = [self.fitness(chrom) for chrom in self.population]
-    max_fit = -1
-    best = 0
-    for i in range(len(self.population)):
-      if fitnesses[i] > max_fit:
-        max_fit = fitnesses[i]
-        best = i
-    return fitnesses[best], self.population[best]
+    _ = [self.fitness(chrom) for chrom in self.population]
+    # max_fit = -1
+    # best = 0
+    # for i in range(len(self.population)):
+    #   if fitnesses[i] > max_fit:
+    #     max_fit = fitnesses[i]
+    #     best = i
+    return self.best_value, self.best_chromosome
 
-  def solve(self):
+  def solve(self, trace: 'list[int]'=None):
     gen = 0
     while gen != Genetic.MAX_GEN:
       fitnesses = [self.fitness(chrom) for chrom in self.population]
       new_population = []
+      
+      if trace is not None:
+        trace.append(self.best_value)
+      # print(fitnesses[best], bin(self.population[best]))
+      new_population.append(self.best_chromosome)
+
       for _ in range(0, Genetic.POPULATION_SIZE, 2):
-        first_parent, second_parent = self.selection(fitnesses, 4)
+        first_parent, second_parent = self.selection(fitnesses, 2)
 
         first_child, second_child = self.cross_over(first_parent, second_parent)
 
@@ -100,11 +112,14 @@ class Genetic:
     return str(sol[0]), state
 
 
+test_seq = 8
+test_num = 5
 def write_result(seq: int, value: str, state: str):
   with open(f"OUTPUT_{seq}.txt", 'w') as f:
     f.write(value + '\n' + state)
 
-with open("INPUT_1.txt") as f:
+
+with open(f"INPUT_{test_seq}.txt") as f:
   lines = f.readlines() 
   W = int(lines[0])
   m = int(lines[1])
@@ -112,8 +127,19 @@ with open("INPUT_1.txt") as f:
   v = [int(l) for l in lines[3].strip().split(', ')]
   c = [int(l) for l in lines[4].strip().split(', ')]
 
-  gen = Genetic(W, m, w, v, c)
-  write_result(1, *gen.solve())
+  best_value = 0
+  best_sol = None
+  for _ in range(test_num):
+    gen = Genetic(W, m, w, v, c)
+    trace = []
+    sol = gen.solve(trace)
+    if int(sol[0]) > best_value:
+      best_value = int(sol[0])
+      best_sol = sol
+    plt.plot(trace)
+  # plt.show()
+  write_result(test_seq, *best_sol)
+plt.show()
   # print(W)
   # print(m)
   # print(w)
