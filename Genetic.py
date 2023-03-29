@@ -112,14 +112,14 @@ class Genetic:
     return str(sol[0]), state
 
 
-test_seq = 8
+test_seq = 3
 test_num = 5
 def write_result(seq: int, value: str, state: str):
-  with open(f"OUTPUT_{seq}.txt", 'w') as f:
+  with open(f"./Output/OUTPUT_{seq}.txt", 'w') as f:
     f.write(value + '\n' + state)
 
 
-with open(f"INPUT_{test_seq}.txt") as f:
+with open(f"./Tests/INPUT_{test_seq}.txt") as f:
   lines = f.readlines() 
   W = int(lines[0])
   m = int(lines[1])
