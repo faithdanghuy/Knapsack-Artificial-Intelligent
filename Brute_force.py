@@ -36,7 +36,7 @@ class BruteForce:
         state = ', '.join([str(i) for i in best_items])
         return str(best_value), state
 
-test_seq = 2
+test_seq = 3
 def write_result(seq: int, value: str, state: str):
     with open(f"./Output/OUTPUT_{seq}.txt", 'w') as f:
         f.write(value + '\n' + state)
@@ -50,7 +50,6 @@ with open(f"./Tests/INPUT_{test_seq}.txt") as f:
     v = [int(l) for l in lines[3].strip().split(', ')]
     c = [int(l) for l in lines[4].strip().split(', ')]
 
-    # for _ in range(test_num):
     bf = BruteForce(W, m, w, v, c)
     value, state = bf.solve()
 

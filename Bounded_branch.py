@@ -1,54 +1,70 @@
+from heapq import heappush, heappop
 
+class Item:
+    def __init__(self, weight, value, c):
+        self.weight = weight
+        self.value = value
+        self.c = c
+
+class Node:
+    def __init__(self, level, value, weight, included, bound):
+        self.level = level
+        self.value = value
+        self.weight = weight
+        self.included = included
+        self.bound = bound
+        
+    def __lt__(self, other):
+        return self.bound > other.bound
 
 class BranchAndBound:
-    def __init__(self, W: int, m: int, w: 'list[int]', v: 'list[int]', c: 'list[int]') -> None:
+    def __init__(self, W, m, w, v, c):
         self.W = W
         self.m = m
-        self.w = w
-        self.v = v
-        self.c = c
-        self.n = len(w)
-        self.best_value = 0
-        self.best_items = []
+        self.items = [Item(w[i], v[i], c[i]) for i in range(len(w))]
+        self.classes = set(c)
 
-    def bound(self, k: int, weight: int, value: int, taken: 'list[bool]') -> float:
-        if weight >= self.W:
+    def bound(self, node):
+        if node.weight > self.W:
             return 0
-        remaining_classes = set(self.c[k:])
-        for i in range(k, self.n):
-            if self.c[i] in remaining_classes:
-                remaining_classes.remove(self.c[i])
-                weight += self.w[i]
-                value += self.v[i]
-                taken[i] = True
-        for i in range(k, self.n):
-            if not taken[i] and self.c[i] not in remaining_classes:
-                frac = min(1, (self.W - weight) / self.w[i])
-                weight += frac * self.w[i]
-                value += frac * self.v[i]
-        return value
+        remaining_classes = self.classes - set([item.c for item in node.included])
+        remaining_items = [item for item in self.items[node.level+1:] if item.c in remaining_classes]
+        remaining_weight = self.W - node.weight
+        bound = node.value
+        for item in remaining_items:
+            if item.weight <= remaining_weight:
+                bound += item.value
+                remaining_weight -= item.weight
+            else:
+                bound += item.value * (remaining_weight / item.weight)
+                break
+        return bound
 
-    def knapsack(self, k: int, weight: int, value: int, taken: 'list[bool]'):
-        if weight <= self.W and value > self.best_value:
-            self.best_value = value
-            self.best_items = taken[:]
-        if k == self.n:
-            return
-        if weight + self.w[k] <= self.W:
-            taken[k] = True
-            self.knapsack(k + 1, weight + self.w[k], value + self.v[k], taken)
-            taken[k] = False
-        if self.bound(k + 1, weight, value, taken) > self.best_value:
-            taken[k] = False
-            self.knapsack(k + 1, weight, value, taken)
+    def solve(self):
+        root = Node(-1, 0, 0, [], 0)
+        heap = [root]
+        max_value = 0
+        solution = []
+        while heap:
+            node = heappop(heap)
+            if node.bound <= max_value:
+                continue
+            if node.level == len(self.items) - 1:
+                if node.value > max_value:
+                    max_value = node.value
+                    solution = node.included
+                continue
+            included = node.included + [self.items[node.level+1]]
+            with_item = Node(node.level+1, node.value+self.items[node.level+1].value, node.weight+self.items[node.level+1].weight, included, self.bound(node))
+            if with_item.bound > max_value:
+                heappush(heap, with_item)
+            without_item = Node(node.level+1, node.value, node.weight, node.included, self.bound(node))
+            if without_item.bound > max_value:
+                heappush(heap, without_item)
 
-    def solve(self) -> 'tuple[int, list[int]]':
-        taken = [False] * self.n
-        self.knapsack(0, 0, 0, taken)
-        return str(self.best_value), ', '.join([str(int(i)) for i in self.best_items])
+        return str(max_value), solution
 
-test_seq = 1
-test_num = 1
+test_seq = 3
 def write_result(seq: int, value: str, state: str):
     with open(f"./Output/OUTPUT_{seq}.txt", 'w') as f:
         f.write(value + '\n' + state)
@@ -61,9 +77,8 @@ with open(f"./Tests/INPUT_{test_seq}.txt") as f:
     w = [int(l) for l in lines[2].strip().split(', ')]
     v = [int(l) for l in lines[3].strip().split(', ')]
     c = [int(l) for l in lines[4].strip().split(', ')]
-    bin_arr = [0] * len(w)
 
     bb = BranchAndBound(W, m, w, v, c)
     value, state = bb.solve()
 
-    write_result(test_seq, value, state)
+write_result(test_seq, value, state)
