@@ -83,5 +83,4 @@ with open(f"./Tests/INPUT_{test_seq}.txt") as f:
 
     lb = LocalBeam(W, m, w, v, c)
     value, state = lb.solve(k=10, max_iterations=1000)
-
 write_result(test_seq, value, state)

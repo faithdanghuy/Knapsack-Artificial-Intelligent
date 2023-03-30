@@ -80,5 +80,4 @@ with open(f"./Tests/INPUT_{test_seq}.txt") as f:
 
     bb = BranchAndBound(W, m, w, v, c)
     value, state = bb.solve()
-
 write_result(test_seq, value, state)

@@ -32,7 +32,6 @@ class BruteForce:
             if value > best_value:
                 best_value = value
                 best_items = combo
-
         state = ', '.join([str(i) for i in best_items])
         return str(best_value), state
 
