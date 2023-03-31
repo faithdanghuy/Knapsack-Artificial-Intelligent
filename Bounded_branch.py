@@ -44,7 +44,6 @@ class BranchAndBound:
 
         # sort items in decreasing order of their value-to-weight ratios
         sorted_items = sorted([(i, self.v[i]/self.w[i]) for i in range(k, self.n)], key=lambda x: -x[1])
-
         for i, _ in sorted_items:
             if weight + self.w[i] <= self.W:
                 taken[i] = True

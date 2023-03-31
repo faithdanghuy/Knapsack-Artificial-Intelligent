@@ -66,7 +66,7 @@ class LocalBeam:
         return best_value, ', '.join([str(i) for i in arr])
 
 test_seq = 2
-test_num = 3
+test_num = 5
 def write_result(seq: int, value: str, state: str):
     with open(f"./Output/OUTPUT_{seq}.txt", 'w') as f:
         f.write(value + '\n' + state)
