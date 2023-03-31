@@ -38,7 +38,6 @@ class BranchAndBound:
         if weight <= self.W and value > self.best_value:
             self.best_value = value
             self.best_items = taken[:]
-
         if k == self.n:
             return
 
