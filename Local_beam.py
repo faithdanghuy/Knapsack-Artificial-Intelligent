@@ -1,7 +1,5 @@
 import random
 
-import random
-
 class LocalBeam:
     def __init__(self, W: int, m: int, w: 'list[int]', v: 'list[int]', c: 'list[int]') -> None:
         self.W = W
@@ -65,9 +63,10 @@ class LocalBeam:
         chosen_items = [i for i in range(self.n) if best_solution[i] == '1']
         for item in chosen_items:
             arr[item] = 1
-        return str(best_value), ', '.join([str(i) for i in arr])
+        return best_value, ', '.join([str(i) for i in arr])
 
-test_seq = 3
+test_seq = 2
+test_num = 5
 def write_result(seq: int, value: str, state: str):
     with open(f"./Output/OUTPUT_{seq}.txt", 'w') as f:
         f.write(value + '\n' + state)
@@ -81,6 +80,14 @@ with open(f"./Tests/INPUT_{test_seq}.txt") as f:
     v = [int(l) for l in lines[3].strip().split(', ')]
     c = [int(l) for l in lines[4].strip().split(', ')]
 
-    lb = LocalBeam(W, m, w, v, c)
-    value, state = lb.solve(k=10, max_iterations=1000)
-write_result(test_seq, value, state)
+    best_value = 0
+    best_state = None
+    for _ in range(test_num):
+        lb = LocalBeam(W, m, w, v, c)
+        value, state = lb.solve(k=10, max_iterations=10000)
+
+        if value > best_value:
+            best_value = value
+            best_state = state
+
+write_result(test_seq, str(best_value), best_state)
