@@ -1,4 +1,4 @@
-import random
+import itertools
 
 class LocalBeam:
     def __init__(self, W: int, m: int, w: 'list[int]', v: 'list[int]', c: 'list[int]') -> None:
@@ -9,20 +9,6 @@ class LocalBeam:
         self.c = c
         self.n = len(w)
         self.k = m
-    
-    def random_solution(self):
-        selected = [0] * self.n
-        for c in range(self.m):
-            items = [i for i in range(self.n) if self.c[i] == c]
-            k = min(self.k, len(items))
-            if k == 0:
-                k = 1
-            if k > len(items):
-                k = len(items)
-            selected_items = random.sample(items, k)
-            for i in selected_items:
-                selected[i] = 1
-        return ''.join(map(str, selected))
     
     def evaluate(self, solution):
         total_value = 0
@@ -44,7 +30,8 @@ class LocalBeam:
         return neighborhood
     
     def solve(self, k, max_iterations):
-        beams = [self.random_solution() for _ in range(k)]
+        initial_solution = max([''.join(map(str, x)) for x in itertools.product([0, 1], repeat=self.n)], key=self.evaluate)
+        beams = [initial_solution] * k
         best_solution = max(beams, key=self.evaluate)
         best_value = self.evaluate(best_solution)
         arr = [0] * self.n
@@ -82,12 +69,14 @@ with open(f"./Tests/INPUT_{test_seq}.txt") as f:
 
     best_value = 0
     best_state = None
-    for _ in range(test_num):
+    for i in range(test_num):
         lb = LocalBeam(W, m, w, v, c)
-        value, state = lb.solve(k=10, max_iterations=10000)
+        value, state = lb.solve(k=10, max_iterations=1000)
 
         if value > best_value:
             best_value = value
             best_state = state
+
+        print(f"Finish test {i+1}")
 
 write_result(test_seq, str(best_value), best_state)

@@ -32,10 +32,10 @@ class BruteForce:
             if value > best_value:
                 best_value = value
                 best_items = combo
-        state = ', '.join([str(i) for i in best_items])
-        return str(best_value), state
+                
+        return str(best_value), ', '.join([str(i) for i in best_items])
 
-test_seq = 3
+test_seq = 2
 def write_result(seq: int, value: str, state: str):
     with open(f"./Output/OUTPUT_{seq}.txt", 'w') as f:
         f.write(value + '\n' + state)
