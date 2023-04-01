@@ -1,5 +1,5 @@
 import random
-import matplotlib.pyplot as plt
+
 class Genetic:
   POPULATION_SIZE = 200
   MUTATION_PROB = 0.1
@@ -112,7 +112,7 @@ class Genetic:
     return str(sol[0]), state
 
 
-test_seq = 3
+test_seq = 2
 test_num = 5
 def write_result(seq: int, value: str, state: str):
   with open(f"./Output/OUTPUT_{seq}.txt", 'w') as f:
@@ -136,12 +136,5 @@ with open(f"./Tests/INPUT_{test_seq}.txt") as f:
     if int(sol[0]) > best_value:
       best_value = int(sol[0])
       best_sol = sol
-    plt.plot(trace)
-  # plt.show()
-  write_result(test_seq, *best_sol)
-plt.show()
-  # print(W)
-  # print(m)
-  # print(w)
-  # print(v)
-  # print(c)
+
+write_result(test_seq, *best_sol)
