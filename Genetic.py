@@ -111,8 +111,7 @@ class Genetic:
     state = ", ".join(bin(sol[1])[2:].rjust(self.n, '0'))
     return str(sol[0]), state
 
-
-test_seq = 2
+test_seq = 4
 test_num = 5
 def write_result(seq: int, value: str, state: str):
   with open(f"./Output/OUTPUT_{seq}.txt", 'w') as f:
